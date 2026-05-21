@@ -6,6 +6,8 @@ import (
 	"main/internal/adapter/postgres"
 	"main/internal/adapter/postgres/repos"
 	"main/internal/app/branch"
+	"main/internal/app/order"
+	"main/internal/app/profile"
 	"main/internal/handler/httpapi"
 	"main/internal/handler/httpapi/handlers"
 	"main/pkg/config"
@@ -20,11 +22,21 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	branchRepo := repos.NewBranchRepo(pool)
+
+	branchRepo := repos.NewBranchRepository(pool)
 	branchService := branch.NewBranchService(branchRepo)
+
+	profileRepo := repos.NewProfileRepository(pool)
+	profileService := profile.NewProfileService(profileRepo)
+
+	orderRepo := repos.NewOrderRepository(pool)
+	orderService := order.NewOrderService(orderRepo)
+
 	router := httpapi.NewRouter(httpapi.RouterDeps{
 		Handlers: handlers.Handlers{
-			BranchService: branchService,
+			BranchService:  branchService,
+			ProfileService: profileService,
+			OrderService:   orderService,
 		},
 	})
 	srv := &http.Server{

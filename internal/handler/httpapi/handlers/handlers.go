@@ -1,7 +1,13 @@
 package handlers
 
-import "main/internal/app/branch"
+import (
+	"main/internal/app/branch"
+	"main/internal/app/order"
+	"main/internal/app/profile"
+)
 
 type Handlers struct {
-	BranchService *branch.BranchService
+	BranchService  *branch.BranchService
+	ProfileService *profile.ProfileService
+	OrderService   *order.OrderService
 }

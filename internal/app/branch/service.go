@@ -1,3 +1,4 @@
+// Package branch
 package branch
 
 import (
@@ -6,16 +7,21 @@ import (
 )
 
 type BranchService struct {
-	branchRepo *repos.BranchRepo
+	branchRepository *repos.BranchRepository
 }
 
-func NewBranchService(branchRepo *repos.BranchRepo) *BranchService {
+func NewBranchService(branchRepo *repos.BranchRepository) *BranchService {
 	return &BranchService{
-		branchRepo: branchRepo,
+		branchRepository: branchRepo,
 	}
 }
 
-func (s *BranchService) CreateBranch(ctx context.Context, name string) error {
-	err := s.branchRepo.CreateBranch(ctx, repos.CreateBranch{Name: name})
+func (s *BranchService) Create(ctx context.Context, name string) error {
+	err := s.branchRepository.Create(ctx, repos.CreateBranch{Name: name})
+	return err
+}
+
+func (s *BranchService) Delete(ctx context.Context, id int64) error {
+	err := s.branchRepository.Delete(ctx, id)
 	return err
 }

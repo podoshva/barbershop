@@ -1,3 +1,4 @@
+// Package repos
 package repos
 
 import (
@@ -7,12 +8,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type BranchRepo struct {
+type BranchRepository struct {
 	pool *pgxpool.Pool
 }
 
-func NewBranchRepo(pool *pgxpool.Pool) *BranchRepo {
-	return &BranchRepo{
+func NewBranchRepository(pool *pgxpool.Pool) *BranchRepository {
+	return &BranchRepository{
 		pool: pool,
 	}
 }
@@ -21,9 +22,16 @@ type CreateBranch struct {
 	Name string
 }
 
-func (r *BranchRepo) CreateBranch(ctx context.Context, in CreateBranch) error {
+func (r *BranchRepository) Create(ctx context.Context, in CreateBranch) error {
 	if _, err := r.pool.Exec(ctx, "INSERT INTO branches (name) VALUES ($1)", in.Name); err != nil {
 		return fmt.Errorf("create branch: %w", err)
+	}
+	return nil
+}
+
+func (r *BranchRepository) Delete(ctx context.Context, id int64) error {
+	if _, err := r.pool.Exec(ctx, "DELETE FROM branches WHERE id = $1", id); err != nil {
+		return fmt.Errorf("delete branch: %w", err)
 	}
 	return nil
 }
