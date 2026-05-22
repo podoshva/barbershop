@@ -46,3 +46,30 @@ func (r *ProfileRepository) Get(ctx context.Context, id int64) (*dto.GetProfile,
 	}
 	return &profile, nil
 }
+
+func (r *ProfileRepository) GetAll(ctx context.Context) ([]dto.GetProfile, error) {
+	rows, err := r.pool.Query(ctx, "SELECT id, branch_id, full_name, login, role FROM profiles")
+	if err != nil {
+		return nil, fmt.Errorf("get profiles: %w", err)
+	}
+	defer rows.Close()
+	var profiles []dto.GetProfile
+	for rows.Next() {
+		var profile dto.GetProfile
+		err := rows.Scan(
+			&profile.ID,
+			&profile.BranchID,
+			&profile.FullName,
+			&profile.Login,
+			&profile.Role,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("scan profile: %w", err)
+		}
+		profiles = append(profiles, profile)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+	return profiles, nil
+}

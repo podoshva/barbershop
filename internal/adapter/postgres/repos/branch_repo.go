@@ -48,3 +48,30 @@ func (r *BranchRepository) Get(ctx context.Context, id int64) (*dto.GetBranch, e
 	}
 	return &branch, nil
 }
+
+func (r *BranchRepository) GetAll(ctx context.Context) ([]dto.GetBranch, error) {
+	rows, err := r.pool.Query(
+		ctx,
+		"SELECT id, name FROM branches",
+	)
+	if err != nil {
+		return nil, fmt.Errorf("get branches: %w", err)
+	}
+	defer rows.Close()
+	var branches []dto.GetBranch
+	for rows.Next() {
+		var branch dto.GetBranch
+		err := rows.Scan(
+			&branch.ID,
+			&branch.Name,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("scan branch: %w", err)
+		}
+		branches = append(branches, branch)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+	return branches, nil
+}

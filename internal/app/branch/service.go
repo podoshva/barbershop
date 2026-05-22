@@ -28,3 +28,7 @@ func (s *BranchService) Delete(ctx context.Context, id int64) error {
 func (s *BranchService) Get(ctx context.Context, id int64) (*dto.GetBranch, error) {
 	return s.branchRepository.Get(ctx, id)
 }
+
+func (s *BranchService) GetAll(ctx context.Context) ([]dto.GetBranch, error) {
+	return s.branchRepository.GetAll(ctx)
+}

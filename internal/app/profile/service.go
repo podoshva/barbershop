@@ -3,7 +3,6 @@ package profile
 
 import (
 	"context"
-	"fmt"
 	"main/internal/adapter/postgres/repos"
 	"main/internal/dto"
 )
@@ -27,15 +26,9 @@ func (s *ProfileService) Delete(ctx context.Context, id int64) error {
 }
 
 func (s *ProfileService) Get(ctx context.Context, id int64) (*dto.GetProfile, error) {
-	profile, err := s.profileRepository.Get(ctx, id)
-	if err != nil {
-		return nil, fmt.Errorf("get profile: %w", err)
-	}
-	return &dto.GetProfile{
-		ID:       profile.ID,
-		BranchID: profile.BranchID,
-		FullName: profile.FullName,
-		Login:    profile.Login,
-		Role:     profile.Role,
-	}, nil
+	return s.profileRepository.Get(ctx, id)
+}
+
+func (s *ProfileService) GetAll(ctx context.Context) ([]dto.GetProfile, error) {
+	return s.profileRepository.GetAll(ctx)
 }

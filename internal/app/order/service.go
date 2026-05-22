@@ -28,3 +28,11 @@ func (s *OrderService) Delete(ctx context.Context, id int64) error {
 func (s *OrderService) Get(ctx context.Context, id int64) (*dto.GetOrder, error) {
 	return s.orderRepository.Get(ctx, id)
 }
+
+func (s *OrderService) GetAll(ctx context.Context) ([]dto.GetOrder, error) {
+	return s.orderRepository.GetAll(ctx)
+}
+
+func (s *OrderService) SetStatus(ctx context.Context, dto dto.SetOrderStatus) (*dto.GetOrder, error) {
+	return s.orderRepository.SetStatus(ctx, dto)
+}

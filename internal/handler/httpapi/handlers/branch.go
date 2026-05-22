@@ -44,3 +44,12 @@ func (h *Handlers) GetBranch(w http.ResponseWriter, r *http.Request) {
 	}
 	httputils.WriteJSON(w, 200, branch)
 }
+
+func (h *Handlers) GetAllBranches(w http.ResponseWriter, r *http.Request) {
+	branches, err := h.BranchService.GetAll(r.Context())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	httputils.WriteJSON(w, 200, branches)
+}

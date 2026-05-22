@@ -48,3 +48,39 @@ func (r *OrderRepository) Get(ctx context.Context, id int64) (*dto.GetOrder, err
 	}
 	return &order, nil
 }
+
+func (r *OrderRepository) GetAll(ctx context.Context) ([]dto.GetOrder, error) {
+	rows, err := r.pool.Query(ctx, "SELECT id, profile_id, branch_id, date, customer_phone, description, status FROM orders")
+	if err != nil {
+		return nil, fmt.Errorf("get orders: %w", err)
+	}
+	defer rows.Close()
+	var orders []dto.GetOrder
+	for rows.Next() {
+		var order dto.GetOrder
+		err := rows.Scan(
+			&order.ID,
+			&order.ProfileID,
+			&order.BranchID,
+			&order.Date,
+			&order.CustomerPhone,
+			&order.Description,
+			&order.Status,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("scan order: %w", err)
+		}
+		orders = append(orders, order)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+	return orders, nil
+}
+
+func (r *OrderRepository) SetStatus(ctx context.Context, dto dto.SetOrderStatus) (*dto.GetOrder, error) {
+	if _, err := r.pool.Exec(ctx, "UPDATE orders SET status = $1 WHERE id = $2", dto.Status, dto.ID); err != nil {
+		return nil, fmt.Errorf("set order status: %w", err)
+	}
+	return r.Get(ctx, dto.ID)
+}

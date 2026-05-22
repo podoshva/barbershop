@@ -20,3 +20,8 @@ type CreateOrder struct {
 	Description   string    `json:"description,omitempty"`
 	Status        string    `json:"status,omitempty"`
 }
+
+type SetOrderStatus struct {
+	ID     int64  `json:"id,omitempty"`
+	Status string `json:"status,omitempty"`
+}
