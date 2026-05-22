@@ -1,3 +1,4 @@
+// Pakcage config
 package config
 
 type Config struct {

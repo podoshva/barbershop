@@ -4,6 +4,7 @@ package branch
 import (
 	"context"
 	"main/internal/adapter/postgres/repos"
+	"main/internal/dto"
 )
 
 type BranchService struct {
@@ -16,12 +17,14 @@ func NewBranchService(branchRepo *repos.BranchRepository) *BranchService {
 	}
 }
 
-func (s *BranchService) Create(ctx context.Context, name string) error {
-	err := s.branchRepository.Create(ctx, repos.CreateBranch{Name: name})
-	return err
+func (s *BranchService) Create(ctx context.Context, dto dto.CreateBranch) error {
+	return s.branchRepository.Create(ctx, dto)
 }
 
 func (s *BranchService) Delete(ctx context.Context, id int64) error {
-	err := s.branchRepository.Delete(ctx, id)
-	return err
+	return s.branchRepository.Delete(ctx, id)
+}
+
+func (s *BranchService) Get(ctx context.Context, id int64) (*dto.GetBranch, error) {
+	return s.branchRepository.Get(ctx, id)
 }

@@ -3,6 +3,7 @@ package repos
 import (
 	"context"
 	"fmt"
+	"main/internal/dto"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -17,15 +18,7 @@ func NewProfileRepository(pool *pgxpool.Pool) *ProfileRepository {
 	}
 }
 
-type CreateProfile struct {
-	BranchID int64
-	FullName string
-	Login    string
-	Password string
-	Role     string
-}
-
-func (r *ProfileRepository) Create(ctx context.Context, in CreateProfile) error {
+func (r *ProfileRepository) Create(ctx context.Context, in dto.CreateProfile) error {
 	if _, err := r.pool.Exec(ctx, "INSERT INTO profiles (branch_id, full_name, login, password, role) VALUES ($1, $2, $3, $4, $5)", in.BranchID, in.FullName, in.Login, in.Password, in.Role); err != nil {
 		return fmt.Errorf("create profile: %w", err)
 	}
@@ -37,4 +30,19 @@ func (r *ProfileRepository) Delete(ctx context.Context, id int64) error {
 		return fmt.Errorf("delete profile: %w", err)
 	}
 	return nil
+}
+
+func (r *ProfileRepository) Get(ctx context.Context, id int64) (*dto.GetProfile, error) {
+	var profile dto.GetProfile
+	err := r.pool.QueryRow(ctx, "SELECT id, branch_id, full_name, login, role FROM profiles WHERE id = $1", id).Scan(
+		&profile.ID,
+		&profile.BranchID,
+		&profile.FullName,
+		&profile.Login,
+		&profile.Role,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("get profile: %w", err)
+	}
+	return &profile, nil
 }
