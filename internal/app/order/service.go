@@ -3,6 +3,7 @@ package order
 
 import (
 	"context"
+	"fmt"
 	"main/internal/adapter/postgres/repos"
 	"main/internal/dto"
 )
@@ -33,6 +34,9 @@ func (s *OrderService) GetAll(ctx context.Context) ([]dto.GetOrder, error) {
 	return s.orderRepository.GetAll(ctx)
 }
 
-func (s *OrderService) SetStatus(ctx context.Context, dto dto.SetOrderStatus) (*dto.GetOrder, error) {
-	return s.orderRepository.SetStatus(ctx, dto)
+func (s *OrderService) SetStatus(ctx context.Context, in dto.SetOrderStatus) (*dto.GetOrder, error) {
+	if in.Status != dto.OrderStatusBooked && in.Status != dto.OrderStatusArchived {
+		return nil, fmt.Errorf("order status incorrect")
+	}
+	return s.orderRepository.SetStatus(ctx, in)
 }

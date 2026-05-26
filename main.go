@@ -5,19 +5,20 @@ import (
 	"log"
 	"main/internal/adapter/postgres"
 	"main/internal/adapter/postgres/repos"
+	"main/internal/app/auth"
 	"main/internal/app/branch"
 	"main/internal/app/order"
 	"main/internal/app/profile"
 	"main/internal/handler/httpapi"
 	"main/internal/handler/httpapi/handlers"
-	"main/pkg/config"
+	"main/pkg"
 	"net/http"
 	"time"
 )
 
 func main() {
 	ctx := context.Background()
-	cfg := config.NewConfig()
+	cfg := pkg.NewConfig()
 	pool, err := postgres.NewPool(ctx, cfg.PostgresDsn)
 	if err != nil {
 		panic(err)
@@ -28,6 +29,7 @@ func main() {
 
 	profileRepo := repos.NewProfileRepository(pool)
 	profileService := profile.NewProfileService(profileRepo)
+	authService := auth.NewAuthService(profileRepo)
 
 	orderRepo := repos.NewOrderRepository(pool)
 	orderService := order.NewOrderService(orderRepo)
@@ -37,8 +39,10 @@ func main() {
 			BranchService:  branchService,
 			ProfileService: profileService,
 			OrderService:   orderService,
+			AuthService:    authService,
 		},
 	})
+
 	srv := &http.Server{
 		Addr:         ":8080",
 		Handler:      router,
@@ -48,4 +52,5 @@ func main() {
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
+
 }

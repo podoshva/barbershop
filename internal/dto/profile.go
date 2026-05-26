@@ -15,3 +15,14 @@ type CreateProfile struct {
 	Password string `json:"password,omitempty"`
 	Role     string `json:"role,omitempty"`
 }
+
+type LoginIn struct {
+	Login    string `json:"login,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
+type LoginOut struct {
+	ID       int64
+	Password string
+	Role     string
+}

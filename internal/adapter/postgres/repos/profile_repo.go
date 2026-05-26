@@ -73,3 +73,12 @@ func (r *ProfileRepository) GetAll(ctx context.Context) ([]dto.GetProfile, error
 	}
 	return profiles, nil
 }
+
+func (r *ProfileRepository) GetAuthByLogin(ctx context.Context, login string) (*dto.LoginOut, error) {
+	var out dto.LoginOut
+	err := r.pool.QueryRow(ctx, "SELECT id, password, role FROM profiles WHERE login = $1", login).Scan(&out.ID, &out.Password, &out.Role)
+	if err != nil {
+		return nil, fmt.Errorf("get auth by login error: %w", err)
+	}
+	return &out, nil
+}

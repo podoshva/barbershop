@@ -1,5 +1,4 @@
-// Pakcage config
-package config
+package pkg
 
 type Config struct {
 	PostgresDsn string

@@ -19,7 +19,7 @@ func NewOrderRepository(pool *pgxpool.Pool) *OrderRepository {
 }
 
 func (r *OrderRepository) Create(ctx context.Context, in dto.CreateOrder) error {
-	if _, err := r.pool.Exec(ctx, "INSERT INTO orders (profile_id, branch_id, date, customer_phone, description, status) VALUES ($1, $2, $3, $4, $5, $6)", in.ProfileID, in.BranchID, in.Date, in.CustomerPhone, in.Description, in.Status); err != nil {
+	if _, err := r.pool.Exec(ctx, "INSERT INTO orders (profile_id, branch_id, date, customer_phone, description) VALUES ($1, $2, $3, $4, $5)", in.ProfileID, in.BranchID, in.Date, in.CustomerPhone, in.Description); err != nil {
 		return fmt.Errorf("create order: %w", err)
 	}
 	return nil
@@ -78,9 +78,19 @@ func (r *OrderRepository) GetAll(ctx context.Context) ([]dto.GetOrder, error) {
 	return orders, nil
 }
 
-func (r *OrderRepository) SetStatus(ctx context.Context, dto dto.SetOrderStatus) (*dto.GetOrder, error) {
-	if _, err := r.pool.Exec(ctx, "UPDATE orders SET status = $1 WHERE id = $2", dto.Status, dto.ID); err != nil {
+func (r *OrderRepository) SetStatus(ctx context.Context, in dto.SetOrderStatus) (*dto.GetOrder, error) {
+	var order dto.GetOrder
+	err := r.pool.QueryRow(ctx, "UPDATE orders SET status = $1 WHERE id = $2 RETURNING id, profile_id, branch_id, date, customer_phone, description, status", in.Status, in.ID).Scan(
+		&order.ID,
+		&order.ProfileID,
+		&order.BranchID,
+		&order.Date,
+		&order.CustomerPhone,
+		&order.Description,
+		&order.Status,
+	)
+	if err != nil {
 		return nil, fmt.Errorf("set order status: %w", err)
 	}
-	return r.Get(ctx, dto.ID)
+	return &order, nil
 }
